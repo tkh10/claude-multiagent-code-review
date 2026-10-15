@@ -2,11 +2,4 @@ node_modules/
 dist/
 .env
 *.log
-logs/
 .DS_Store
-.vscode/
-.idea/
-coverage/
-*.tsbuildinfo
-.temp/
-reports/

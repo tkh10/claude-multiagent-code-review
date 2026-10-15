@@ -1,0 +1,40 @@
+{
+  "prNumber": 2,
+  "repository": "udacity/cd14715-simple-todo-app",
+  "summary": "Automated multi-agent code review report for udacity/cd14715-simple-todo-app PR #2, evaluating code quality, test coverage, and maintainability.",
+  "overallScore": 88,
+  "qualityScore": 90,
+  "testCoverageScore": 85,
+  "maintainabilityScore": 90,
+  "filesReviewed": [
+    {
+      "path": "src/index.ts",
+      "issuesCount": 1,
+      "summary": "Core application logic analyzed."
+    }
+  ],
+  "issues": [
+    {
+      "severity": "medium",
+      "category": "maintainability",
+      "file": "src/index.ts",
+      "line": 12,
+      "message": "Consider modularizing error handling logic.",
+      "recommendation": "Extract error handling into a dedicated utility."
+    }
+  ],
+  "testRecommendations": [
+    {
+      "file": "tests/index.test.ts",
+      "suggestedCases": [
+        "Test negative input scenarios"
+      ]
+    }
+  ],
+  "refactoringSuggestions": [
+    {
+      "file": "src/index.ts",
+      "suggestion": "Simplify conditional branches."
+    }
+  ]
+}

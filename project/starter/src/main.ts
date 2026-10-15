@@ -1,48 +1,47 @@
-import * as dotenv from 'dotenv';
+import { validateEnv } from './config/env.js';
+import { Orchestrator } from './orchestrator.js';
+import { ReportGenerator } from './utils/report-generator.js';
 
-// Load environment variables
-dotenv.config();
-
-/**
- * Main entry point for the Claude Multi-Agent Code Review System
- * Usage: npm run dev <owner> <repo> <pr-number>
- */
 async function main() {
-  const [owner, repo, prStr] = process.argv.slice(2);
+  validateEnv();
 
-  // TODO: Validate command line arguments
-  // - Check if owner, repo, and prStr are provided
-  // - Convert prStr to number and validate it's a valid integer
-  // - Exit with error message if validation fails
+  const args = process.argv.slice(2);
+  if (args.length !== 3) {
+    console.error('Usage: npm run dev <owner> <repo> <pr-number>');
+    console.error('Example: npm run dev udacity cd14715-simple-todo-app 1');
+    process.exit(1);
+  }
 
-  // TODO: Validate authentication (choose ONE method)
-  // Students must have either:
-  //   - ANTHROPIC_API_KEY environment variable, OR
-  //   - AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY for Bedrock
-  //
-  // If using AWS Bedrock:
-  //   - Verify AWS_REGION is set
-  //   - Log: "🔐 Using AWS Bedrock authentication"
-  // If using Anthropic API:
-  //   - Log: "🔐 Using Anthropic API authentication"
-  // If neither method is configured:
-  //   - Exit with clear error message showing both options
+  const owner = args[0] as string;
+  const repo = args[1] as string;
+  const prNumberStr = args[2] as string;
+  const prNumber = parseInt(prNumberStr, 10);
 
-  // TODO: Validate ANTHROPIC_MODEL environment variable
-  // This is REQUIRED for both authentication methods
-  // - For AWS Bedrock: us.anthropic.claude-sonnet-4-5-20250929-v1:0
-  // - For Anthropic API: claude-sonnet-4-5-20250929
-  // Exit with error if not set
+  if (isNaN(prNumber) || prNumber <= 0) {
+    console.error(`Error: PR number must be a positive integer, got: "${prNumberStr}"`);
+    process.exit(1);
+  }
 
-  console.log('start here', owner, repo, prStr)
   try {
-    // TODO: Create orchestrator instance
-    // TODO: Call .reviewPullRequest(owner, repo, prNumber);
-    // TODO: Generate formatted reports using ReportGenerator
-    // Hint: Use ReportGenerator to create Markdown, HTML, and JSON reports
-    // Save reports to 'reports/' directory with appropriate filenames
+    console.log(`[info]: Starting code review for ${owner}/${repo} PR #${prNumber}...`);
+    const orchestrator = new Orchestrator();
+    const result = await orchestrator.reviewPullRequest(owner, repo, prNumber);
+
+    const generator = new ReportGenerator();
+    const baseName = `reports/pr-${prNumber}-report`;
+    await generator.generateJSON(result, `${baseName}.json`);
+    await generator.generateMarkdown(result, `${baseName}.md`);
+    await generator.generateHTML(result, `${baseName}.html`);
+
+    console.log(`[info]: ✓ Review complete. Reports saved to reports/ directory.`);
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[error]: Failed to complete pull request review:');
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error('An unexpected error occurred during execution.');
+    }
+    process.exit(1);
   }
 }
 
