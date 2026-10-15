@@ -29,11 +29,11 @@ export class Orchestrator {
               'SearchFiles',
               'Task'
             ],
-            agents: [
-              codeQualityAnalyzer as any,
-              testCoverageAnalyzer as any,
-              refactoringSuggester as any
-            ]
+            agents: {
+              codeQualityAnalyzer,
+              testCoverageAnalyzer,
+              refactoringSuggester
+            } as any
           }
         });
 
